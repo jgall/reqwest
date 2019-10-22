@@ -170,6 +170,13 @@ impl StdError for Error {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
+impl From<crate::error::Error> for wasm_bindgen::JsValue {
+    fn from(err: Error) -> wasm_bindgen::JsValue {
+        wasm_bindgen::JsValue::from_str(&format!("{}", err))
+    }
+}
+
 #[derive(Debug)]
 pub(crate) enum Kind {
     Builder,

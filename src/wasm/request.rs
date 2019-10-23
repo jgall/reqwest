@@ -1,6 +1,8 @@
 use std::fmt;
 
-use http::{Method, HeaderMap};
+use crate::header::{HeaderMap, HeaderName, HeaderValue};
+
+use http::{HttpTryFrom, Method};
 use url::Url;
 
 use super::{Body, Client, Response};
@@ -83,11 +85,46 @@ impl RequestBuilder {
         RequestBuilder { client, request }
     }
 
-
     /// Set the request body.
     pub fn body<T: Into<Body>>(mut self, body: T) -> RequestBuilder {
         if let Ok(ref mut req) = self.request {
             req.body = Some(body.into());
+        }
+        self
+    }
+
+    /// Add a `Header` to this Request.
+    ///
+    /// ```rust
+    /// use reqwest::header::USER_AGENT;
+    ///
+    /// # fn run() -> Result<(), Box<std::error::Error>> {
+    /// let client = reqwest::blocking::Client::new();
+    /// let res = client.get("https://www.rust-lang.org")
+    ///     .header(USER_AGENT, "foo")
+    ///     .send()?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn header<K, V>(mut self, key: K, value: V) -> RequestBuilder
+    where
+        HeaderName: HttpTryFrom<K>,
+        HeaderValue: HttpTryFrom<V>,
+    {
+        let mut error = None;
+        if let Ok(ref mut req) = self.request {
+            match <HeaderName as HttpTryFrom<K>>::try_from(key) {
+                Ok(key) => match <HeaderValue as HttpTryFrom<V>>::try_from(value) {
+                    Ok(value) => {
+                        req.headers_mut().append(key, value);
+                    }
+                    Err(e) => error = Some(crate::error::builder(e.into())),
+                },
+                Err(e) => error = Some(crate::error::builder(e.into())),
+            };
+        }
+        if let Some(err) = error {
+            self.request = Err(err);
         }
         self
     }

@@ -115,6 +115,7 @@ wasm-bindgen-futures = { version = "0.3", features = ["futures_0_3"] }
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 wasm-bindgen-test = "0.3.1"
 
+
 [target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
 version = "0.3.28"
 features = [
@@ -154,4 +155,5 @@ required-features = ["cookies"]
 name = "gzip"
 path = "tests/gzip.rs"
 required-features = ["gzip"]
+
 

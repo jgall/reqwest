@@ -1,3 +1,4 @@
+#[cfg(not(target_arch = "wasm32"))]
 pub mod server;
 
 // TODO: remove once done converting to new support server?

@@ -3,7 +3,7 @@
 //! This is useful for some ad-hoc experiments and situations when you don't
 //! really care about the structure of the JSON and just need to display it or
 //! process it at runtime.
-
+#[cfg(not(target_arch = "wasm32"))]
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
     let echo_json: serde_json::Value = reqwest::Client::new()
@@ -37,3 +37,5 @@ async fn main() -> Result<(), reqwest::Error> {
     // )
     Ok(())
 }
+#[cfg(target_arch = "wasm32")]
+fn main() {}

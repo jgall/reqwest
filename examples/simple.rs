@@ -1,5 +1,5 @@
 #![deny(warnings)]
-
+#[cfg(not(target_arch = "wasm32"))]
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
     let res = reqwest::Client::new()
@@ -15,3 +15,6 @@ async fn main() -> Result<(), reqwest::Error> {
 
     Ok(())
 }
+
+#[cfg(target_arch = "wasm32")]
+fn main() {}
